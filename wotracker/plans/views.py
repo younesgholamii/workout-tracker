@@ -1,22 +1,25 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from .models import PlansModel
-from .serializers import PlansDetailSerializers
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import generics, permissions
+from .models import WorkoutPlan, Exercise
+from .serializers import WorkoutPlanSerializer, ExerciseSerializer
 
+class WorkoutPlanListCreateView(generics.ListCreateAPIView):
+    serializer_class = WorkoutPlanSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        return WorkoutPlan.objects.filter(user=self.request.user)
 
-class PlansDetailView(APIView):
-    def get(self, request):
-        plans = PlansModel.objects.all()
-        serializer = PlansDetailSerializers(plans, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = PlansDetailSerializers(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
+class WorkoutPlanDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = WorkoutPlanSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return WorkoutPlan.objects.filter(user=self.request.user)
+
+class ExerciseListView(generics.ListAPIView):
+    queryset = Exercise.objects.all()
+    serializer_class = ExerciseSerializer
+    permission_classes = [permissions.IsAuthenticated]

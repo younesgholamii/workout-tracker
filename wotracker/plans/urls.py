@@ -1,8 +1,8 @@
 from django.urls import path
-from . import views
+from .views import WorkoutPlanListCreateView, WorkoutPlanDetailView, ExerciseListView
 
-
-app_name = 'plans'
 urlpatterns = [
-    path('details/', views.PlansDetailView.as_view(), name='details')
+    path('workout-plans/', WorkoutPlanListCreateView.as_view(), name='workout-plan-list'),
+    path('workout-plans/<int:pk>/', WorkoutPlanDetailView.as_view(), name='workout-plan-detail'),
+    path('exercises/', ExerciseListView.as_view(), name='exercise-list'),
 ]

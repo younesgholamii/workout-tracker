@@ -1,21 +1,21 @@
 from django.db import models
-from ..utils import category_choices, status_choices
+from accounts.models import User
 
-class Plans(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.CharField(max_length=50, choices=category_choices, default='cardio')
-    status = models.CharField(max_length=50, choices=status_choices, default='pending')
-    date = models.DateTimeField()
-    description = models.TextField(null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+class Exercise(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    category = models.CharField(max_length=100)
+    muscle_group = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.name
-    
-    def day_of_week(self):
-        return self.date.strftime('%A')
-    
-    def time(self):
-        return self.date.strftime('%H:%M')
-    
+class WorkoutPlan(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    scheduled_date = models.DateTimeField()
+
+class WorkoutExercise(models.Model):
+    workout_plan = models.ForeignKey(WorkoutPlan, on_delete=models.CASCADE, related_name='exercises')
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
+    sets = models.IntegerField()
+    reps = models.IntegerField()
+    weight = models.FloatField()
+    comments = models.TextField(blank=True, null=True)
